@@ -14,6 +14,7 @@ from algorithms.maddpg import MADDPG
 
 USE_CUDA = False  # torch.cuda.is_available()
 
+
 def make_parallel_env(env_id, n_rollout_threads, seed, discrete_action):
     def get_env_fn(rank):
         def init_env():
@@ -26,6 +27,7 @@ def make_parallel_env(env_id, n_rollout_threads, seed, discrete_action):
         return DummyVecEnv([get_env_fn(0)])
     else:
         return SubprocVecEnv([get_env_fn(i) for i in range(n_rollout_threads)])
+
 
 def run(config):
     model_dir = Path('./models') / config.env_id / config.model_name
@@ -74,8 +76,7 @@ def run(config):
 
         for et_i in range(config.episode_length):
             # rearrange observations to be per agent, and convert to torch Variable
-            torch_obs = [Variable(torch.Tensor(np.vstack(obs[:, i])),
-                                  requires_grad=False)
+            torch_obs = [Variable(torch.Tensor(np.vstack(obs[:, i])), requires_grad=False)
                          for i in range(maddpg.nagents)]
             # get actions as torch Variables
             torch_agent_actions = maddpg.step(torch_obs, explore=True)

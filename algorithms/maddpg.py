@@ -7,6 +7,7 @@ from utils.agents import DDPGAgent
 
 MSELoss = torch.nn.MSELoss()
 
+
 class MADDPG(object):
     """
     Wrapper class for DDPG-esque (i.e. also MADDPG) agents in multi-agent task
@@ -76,8 +77,7 @@ class MADDPG(object):
         Outputs:
             actions: List of actions for each agent
         """
-        return [a.step(obs, explore=explore) for a, obs in zip(self.agents,
-                                                                 observations)]
+        return [a.step(obs, explore=explore) for a, obs in zip(self.agents, observations)]
 
     def update(self, sample, agent_i, parallel=False, logger=None):
         """
@@ -97,7 +97,7 @@ class MADDPG(object):
 
         curr_agent.critic_optimizer.zero_grad()
         if self.alg_types[agent_i] == 'MADDPG':
-            if self.discrete_action: # one-hot encode action
+            if self.discrete_action:  # one-hot encode action
                 all_trgt_acs = [onehot_from_logits(pi(nobs)) for pi, nobs in
                                 zip(self.target_policies, next_obs)]
             else:
@@ -155,8 +155,7 @@ class MADDPG(object):
                     all_pol_acs.append(pi(ob))
             vf_in = torch.cat((*obs, *all_pol_acs), dim=1)
         else:  # DDPG
-            vf_in = torch.cat((obs[agent_i], curr_pol_vf_in),
-                              dim=1)
+            vf_in = torch.cat((obs[agent_i], curr_pol_vf_in), dim=1)
         pol_loss = -curr_agent.critic(vf_in).mean()
         pol_loss += (curr_pol_out**2).mean() * 1e-3
         pol_loss.backward()

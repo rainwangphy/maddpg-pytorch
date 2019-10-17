@@ -5,6 +5,7 @@ from .networks import MLPNetwork
 from .misc import hard_update, gumbel_softmax, onehot_from_logits
 from .noise import OUNoise
 
+
 class DDPGAgent(object):
     """
     General class for DDPG agents (policy, critic, target policy, target
